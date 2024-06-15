@@ -46,7 +46,7 @@ public class NeverstopApplication {
 
 	@GetMapping("/message")
 	public String getMessage(){
-		return "Hey Praveen !! Your application sucessfully Deployed in Azure";
+		return "Hey RAJI !! Your application sucessfully Deployed in Azure";
 	}
 
 }
