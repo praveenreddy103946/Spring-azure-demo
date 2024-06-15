@@ -1,17 +1,14 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy JAR app to Azure Web App - neverstop
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+push:
+branches:
+- main
+workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: windows-latest
+build:
+runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -30,14 +27,14 @@ jobs:
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
 
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
+deploy:
+runs-on: windows-latest
+needs: build
+environment:
+name: 'production'
+url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+permissions:
+id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -59,4 +56,11 @@ jobs:
           app-name: 'neverstop'
           slot-name: 'production'
           package: '*.jar'
-          
+
+      - name: Restart Azure Web App
+        run: az webapp restart --name neverstop --resource-group praveen-group
+        # Optionally, wait a few seconds before checking the URL
+        # run: sleep 10s
+
+      - name: Check deployed application
+        run: curl --retry 10 --retry-connrefused --retry-delay 5 -sSf ${{ steps.deploy-to-webapp.outputs.webapp-url }}
